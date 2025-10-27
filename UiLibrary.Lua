@@ -1,60 +1,51 @@
---// Simple Beginner UI Library with Dragging + Loading Screen
+--[[
+	Simple UI Library with Working Dragging and Loading Screen
+	Made beginner-friendly and human readable
+--]]
+
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
 
 local Library = {}
-Library.__index = Library
 
 -- // Loading Screen
-local gui = Instance.new("ScreenGui")
-gui.Name = "UiLibrary"
-gui.Parent = game.CoreGui
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "UiLibrary"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local loading = Instance.new("Frame")
-loading.Parent = gui
+loading.Parent = ScreenGui
 loading.Size = UDim2.new(1,0,1,0)
 loading.BackgroundColor3 = Color3.fromRGB(15,15,15)
 
-local loadText = Instance.new("TextLabel")
-loadText.Parent = loading
-loadText.AnchorPoint = Vector2.new(0.5,0.5)
-loadText.Position = UDim2.new(0.5,0,0.5,0)
-loadText.Size = UDim2.new(0,300,0,50)
-loadText.Text = "Loading UI..."
-loadText.TextColor3 = Color3.new(1,1,1)
-loadText.Font = Enum.Font.GothamBold
-loadText.TextSize = 28
-loadText.BackgroundTransparency = 1
+local text = Instance.new("TextLabel")
+text.Parent = loading
+text.AnchorPoint = Vector2.new(0.5,0.5)
+text.Position = UDim2.new(0.5,0,0.5,0)
+text.Size = UDim2.new(0,300,0,50)
+text.Text = "Loading UI..."
+text.TextColor3 = Color3.new(1,1,1)
+text.Font = Enum.Font.GothamBold
+text.TextSize = 30
+text.BackgroundTransparency = 1
 
-task.wait(1)
-TweenService:Create(loading, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
-TweenService:Create(loadText, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
-task.wait(0.6)
+for i = 1,100 do
+	TweenService:Create(text, TweenInfo.new(0.01), {TextTransparency = i/100}):Play()
+	task.wait(0.005)
+end
 loading:Destroy()
 
--- // Create Window
-function Library:CreateWindow(title)
-	local Window = {}
-	Window.__index = Window
+-- // Dragging helper
+local function makeDraggable(frame, dragArea)
+	local dragging = false
+	local dragStart, startPos
 
-	local main = Instance.new("Frame")
-	main.Name = "Window"
-	main.Parent = gui
-	main.Size = UDim2.new(0,450,0,300)
-	main.Position = UDim2.new(0.5,-225,0.5,-150)
-	main.BackgroundColor3 = Color3.fromRGB(25,25,25)
-	main.BorderSizePixel = 0
-	main.Active = true
-
-	-- Dragging system
-	local dragging, dragStart, startPos
-	main.InputBegan:Connect(function(input)
+	dragArea.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = true
 			dragStart = input.Position
-			startPos = main.Position
+			startPos = frame.Position
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
@@ -62,48 +53,59 @@ function Library:CreateWindow(title)
 			end)
 		end
 	end)
+
 	UIS.InputChanged:Connect(function(input)
 		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 			local delta = input.Position - dragStart
-			main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 		end
 	end)
+end
 
-	local titleBar = Instance.new("TextLabel")
-	titleBar.Parent = main
-	titleBar.Size = UDim2.new(1,0,0,30)
-	titleBar.BackgroundColor3 = Color3.fromRGB(40,40,40)
-	titleBar.Text = title or "Untitled UI"
-	titleBar.TextColor3 = Color3.fromRGB(255,255,255)
-	titleBar.Font = Enum.Font.GothamBold
-	titleBar.TextSize = 16
+-- // Create Window
+function Library:CreateWindow(title)
+	local Window = {}
+	
+	local main = Instance.new("Frame")
+	main.Parent = ScreenGui
+	main.Size = UDim2.new(0,450,0,300)
+	main.Position = UDim2.new(0.5,-225,0.5,-150)
+	main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+	main.BorderSizePixel = 0
 
-	local tabs = Instance.new("Frame")
-	tabs.Parent = main
-	tabs.Size = UDim2.new(0,100,1,-30)
-	tabs.Position = UDim2.new(0,0,0,30)
-	tabs.BackgroundColor3 = Color3.fromRGB(35,35,35)
-	tabs.BorderSizePixel = 0
+	local topBar = Instance.new("TextLabel")
+	topBar.Parent = main
+	topBar.Size = UDim2.new(1,0,0,30)
+	topBar.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	topBar.Text = title or "UI Window"
+	topBar.TextColor3 = Color3.fromRGB(255,255,255)
+	topBar.Font = Enum.Font.GothamBold
+	topBar.TextSize = 16
+
+	makeDraggable(main, topBar)
+
+	local tabButtons = Instance.new("Frame")
+	tabButtons.Parent = main
+	tabButtons.Size = UDim2.new(0,100,1,-30)
+	tabButtons.Position = UDim2.new(0,0,0,30)
+	tabButtons.BackgroundColor3 = Color3.fromRGB(35,35,35)
 
 	local container = Instance.new("Frame")
 	container.Parent = main
 	container.Size = UDim2.new(1,-100,1,-30)
 	container.Position = UDim2.new(0,100,0,30)
 	container.BackgroundColor3 = Color3.fromRGB(45,45,45)
-	container.BorderSizePixel = 0
 
 	function Window:CreateTab(name)
-		local tab = {}
-		tab.__index = tab
-
+		local Tab = {}
 		local btn = Instance.new("TextButton")
-		btn.Parent = tabs
+		btn.Parent = tabButtons
 		btn.Size = UDim2.new(1,0,0,30)
 		btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
-		btn.Text = name
-		btn.TextColor3 = Color3.fromRGB(255,255,255)
+		btn.TextColor3 = Color3.new(1,1,1)
 		btn.Font = Enum.Font.Gotham
 		btn.TextSize = 14
+		btn.Text = name
 
 		local page = Instance.new("ScrollingFrame")
 		page.Parent = container
@@ -114,9 +116,7 @@ function Library:CreateWindow(title)
 
 		btn.MouseButton1Click:Connect(function()
 			for _,v in pairs(container:GetChildren()) do
-				if v:IsA("ScrollingFrame") then
-					v.Visible = false
-				end
+				if v:IsA("ScrollingFrame") then v.Visible = false end
 			end
 			page.Visible = true
 		end)
@@ -125,7 +125,7 @@ function Library:CreateWindow(title)
 			page.Visible = true
 		end
 
-		function tab:CreateButton(text, callback)
+		function Tab:CreateButton(text, callback)
 			local b = Instance.new("TextButton")
 			b.Parent = page
 			b.Size = UDim2.new(0,200,0,30)
@@ -140,7 +140,7 @@ function Library:CreateWindow(title)
 			end)
 		end
 
-		function tab:CreateToggle(text, callback)
+		function Tab:CreateToggle(text, callback)
 			local t = Instance.new("TextButton")
 			t.Parent = page
 			t.Size = UDim2.new(0,200,0,30)
@@ -159,15 +159,15 @@ function Library:CreateWindow(title)
 			end)
 		end
 
-		function tab:CreateSlider(name, min, max, start, callback)
-			local sliderFrame = Instance.new("Frame")
-			sliderFrame.Parent = page
-			sliderFrame.Size = UDim2.new(0,200,0,50)
-			sliderFrame.Position = UDim2.new(0,10,0,#page:GetChildren()*35)
-			sliderFrame.BackgroundTransparency = 1
+		function Tab:CreateSlider(name, min, max, start, callback)
+			local f = Instance.new("Frame")
+			f.Parent = page
+			f.Size = UDim2.new(0,200,0,40)
+			f.Position = UDim2.new(0,10,0,#page:GetChildren()*35)
+			f.BackgroundTransparency = 1
 
 			local title = Instance.new("TextLabel")
-			title.Parent = sliderFrame
+			title.Parent = f
 			title.Size = UDim2.new(1,0,0,20)
 			title.Text = name.." ("..start..")"
 			title.TextColor3 = Color3.new(1,1,1)
@@ -176,7 +176,7 @@ function Library:CreateWindow(title)
 			title.BackgroundTransparency = 1
 
 			local bar = Instance.new("Frame")
-			bar.Parent = sliderFrame
+			bar.Parent = f
 			bar.Position = UDim2.new(0,0,0,25)
 			bar.Size = UDim2.new(1,0,0,5)
 			bar.BackgroundColor3 = Color3.fromRGB(80,80,80)
@@ -208,50 +208,7 @@ function Library:CreateWindow(title)
 			end)
 		end
 
-		function tab:CreateDropdown(name, list, callback)
-			local drop = Instance.new("TextButton")
-			drop.Parent = page
-			drop.Size = UDim2.new(0,200,0,30)
-			drop.Position = UDim2.new(0,10,0,#page:GetChildren()*35)
-			drop.BackgroundColor3 = Color3.fromRGB(60,60,60)
-			drop.Text = name
-			drop.TextColor3 = Color3.new(1,1,1)
-			drop.Font = Enum.Font.Gotham
-			drop.TextSize = 14
-
-			local open = false
-			local listFrame = Instance.new("Frame")
-			listFrame.Parent = page
-			listFrame.Size = UDim2.new(0,200,0,#list*25)
-			listFrame.Position = drop.Position + UDim2.new(0,0,0,30)
-			listFrame.BackgroundColor3 = Color3.fromRGB(40,40,40)
-			listFrame.Visible = false
-
-			for _,v in ipairs(list) do
-				local opt = Instance.new("TextButton")
-				opt.Parent = listFrame
-				opt.Size = UDim2.new(1,0,0,25)
-				opt.Position = UDim2.new(0,0,0,(_-1)*25)
-				opt.BackgroundColor3 = Color3.fromRGB(50,50,50)
-				opt.TextColor3 = Color3.new(1,1,1)
-				opt.Font = Enum.Font.Gotham
-				opt.TextSize = 13
-				opt.Text = v
-				opt.MouseButton1Click:Connect(function()
-					drop.Text = name..": "..v
-					listFrame.Visible = false
-					open = false
-					if callback then callback(v) end
-				end)
-			end
-
-			drop.MouseButton1Click:Connect(function()
-				open = not open
-				listFrame.Visible = open
-			end)
-		end
-
-		function tab:CreateTextbox(name, callback)
+		function Tab:CreateTextbox(name, callback)
 			local label = Instance.new("TextLabel")
 			label.Parent = page
 			label.Size = UDim2.new(0,200,0,20)
@@ -272,16 +229,14 @@ function Library:CreateWindow(title)
 			box.Font = Enum.Font.Gotham
 			box.TextSize = 14
 			box.FocusLost:Connect(function(enter)
-				if enter and callback then
-					callback(box.Text)
-				end
+				if enter and callback then callback(box.Text) end
 			end)
 		end
 
-		return tab
+		return Tab
 	end
 
-	return setmetatable(Window, Window)
+	return Window
 end
 
-return setmetatable(Library, Library)
+return Library
