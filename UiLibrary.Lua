@@ -81,9 +81,13 @@ function Library:CreateWindow(name)
 		Page.Parent = ContentHolder
 
 		local layout = Instance.new("UIListLayout", Page)
-		layout.Padding = UDim.new(0, 6)
+		layout.Padding = UDim.new(0, 8)
 		layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 		layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+		local padding = Instance.new("UIPadding", Page)
+		padding.PaddingLeft = UDim.new(0, 6)
+		padding.PaddingTop = UDim.new(0, 6)
 
 		TabButton.MouseButton1Click:Connect(function()
 			for _, other in pairs(ContentHolder:GetChildren()) do
@@ -111,9 +115,11 @@ function Library:CreateWindow(name)
 		end
 
 		function Section:CreateToggle(text, callback)
-			local Frame = Instance.new("Frame")
+			local Frame = Instance.new("TextButton")
 			Frame.Size = UDim2.new(1, -10, 0, 30)
 			Frame.BackgroundColor3 = Themes[Library.Theme].Secondary
+			Frame.Text = ""
+			Frame.AutoButtonColor = false
 			Frame.Parent = Page
 
 			local Label = Instance.new("TextLabel")
@@ -134,13 +140,11 @@ function Library:CreateWindow(name)
 			ToggleBtn.Parent = Frame
 
 			local on = false
-			Frame.InputBegan:Connect(function(inp)
-				if inp.UserInputType == Enum.UserInputType.MouseButton1 then
-					on = not on
-					local goal = on and Themes[Library.Theme].Accent or Color3.fromRGB(80, 80, 80)
-					TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = goal}):Play()
-					pcall(callback, on)
-				end
+			Frame.MouseButton1Click:Connect(function()
+				on = not on
+				local goal = on and Themes[Library.Theme].Accent or Color3.fromRGB(80, 80, 80)
+				TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = goal}):Play()
+				pcall(callback, on)
 			end)
 		end
 
