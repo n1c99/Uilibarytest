@@ -1,9 +1,3 @@
---[[
-    Minimal UI Library by YOU
-    Supports: Tabs, Buttons, Toggles, Sliders, Dropdowns, Textboxes, Themes
-    Works in exploits or normal Studio localscripts
-]]
-
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
@@ -31,13 +25,6 @@ function Library:SetTheme(theme)
 	end
 end
 
--- Helper
-local function makeRound(obj, radius)
-	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, radius)
-	c.Parent = obj
-end
-
 function Library:CreateWindow(name)
 	local Gui = Instance.new("ScreenGui")
 	Gui.Name = name or "Window"
@@ -50,7 +37,6 @@ function Library:CreateWindow(name)
 	Main.BackgroundColor3 = Themes[self.Theme].Main
 	Main.Active = true
 	Main.Draggable = true
-	makeRound(Main, 12)
 	Main.Parent = Gui
 
 	local Topbar = Instance.new("TextLabel")
@@ -61,13 +47,11 @@ function Library:CreateWindow(name)
 	Topbar.TextSize = 16
 	Topbar.Text = name or "Window"
 	Topbar.Parent = Main
-	makeRound(Topbar, 12)
 
 	local TabHolder = Instance.new("Frame")
 	TabHolder.Size = UDim2.new(0, 130, 1, -35)
 	TabHolder.Position = UDim2.new(0, 0, 0, 35)
 	TabHolder.BackgroundColor3 = Themes[self.Theme].Secondary
-	makeRound(TabHolder, 8)
 	TabHolder.Parent = Main
 
 	local ContentHolder = Instance.new("Frame")
@@ -121,7 +105,6 @@ function Library:CreateWindow(name)
 			btn.TextSize = 14
 			btn.Text = text
 			btn.Parent = Page
-			makeRound(btn, 6)
 			btn.MouseButton1Click:Connect(function()
 				pcall(callback)
 			end)
@@ -131,7 +114,6 @@ function Library:CreateWindow(name)
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(1, -10, 0, 30)
 			Frame.BackgroundColor3 = Themes[Library.Theme].Secondary
-			makeRound(Frame, 6)
 			Frame.Parent = Page
 
 			local Label = Instance.new("TextLabel")
@@ -149,7 +131,6 @@ function Library:CreateWindow(name)
 			ToggleBtn.Size = UDim2.new(0, 24, 0, 24)
 			ToggleBtn.Position = UDim2.new(1, -30, 0.5, -12)
 			ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-			makeRound(ToggleBtn, 6)
 			ToggleBtn.Parent = Frame
 
 			local on = false
@@ -167,7 +148,6 @@ function Library:CreateWindow(name)
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(1, -10, 0, 40)
 			Frame.BackgroundColor3 = Themes[Library.Theme].Secondary
-			makeRound(Frame, 6)
 			Frame.Parent = Page
 
 			local Label = Instance.new("TextLabel")
@@ -185,13 +165,11 @@ function Library:CreateWindow(name)
 			Bar.Size = UDim2.new(1, -10, 0, 6)
 			Bar.Position = UDim2.new(0, 5, 1, -12)
 			Bar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-			makeRound(Bar, 6)
 			Bar.Parent = Frame
 
 			local Fill = Instance.new("Frame")
 			Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
 			Fill.BackgroundColor3 = Themes[Library.Theme].Accent
-			makeRound(Fill, 6)
 			Fill.Parent = Bar
 
 			local dragging = false
@@ -216,7 +194,6 @@ function Library:CreateWindow(name)
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(1, -10, 0, 30)
 			Frame.BackgroundColor3 = Themes[Library.Theme].Secondary
-			makeRound(Frame, 6)
 			Frame.Parent = Page
 
 			local Label = Instance.new("TextLabel")
@@ -238,7 +215,6 @@ function Library:CreateWindow(name)
 			DropBtn.Font = Enum.Font.Gotham
 			DropBtn.TextSize = 14
 			DropBtn.Text = "▼"
-			makeRound(DropBtn, 6)
 			DropBtn.Parent = Frame
 
 			local open = false
@@ -246,7 +222,6 @@ function Library:CreateWindow(name)
 			ListFrame.Size = UDim2.new(1, -10, 0, #list * 25)
 			ListFrame.Position = UDim2.new(0, 5, 1, 5)
 			ListFrame.BackgroundColor3 = Themes[Library.Theme].Secondary
-			makeRound(ListFrame, 6)
 			ListFrame.Visible = false
 			ListFrame.Parent = Frame
 
@@ -280,7 +255,6 @@ function Library:CreateWindow(name)
 			local Box = Instance.new("TextBox")
 			Box.Size = UDim2.new(1, -10, 0, 30)
 			Box.BackgroundColor3 = Themes[Library.Theme].Secondary
-			makeRound(Box, 6)
 			Box.Text = ""
 			Box.PlaceholderText = placeholder or "Enter text..."
 			Box.TextColor3 = Themes[Library.Theme].Text
@@ -294,7 +268,7 @@ function Library:CreateWindow(name)
 			end)
 		end
 
-		Page.Visible = (#ContentHolder:GetChildren() == 1) -- open first tab by default
+		Page.Visible = (#ContentHolder:GetChildren() == 1)
 		return Section
 	end
 
