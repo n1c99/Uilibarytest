@@ -2,7 +2,7 @@ local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local Library = {}
-Library.Theme = "Dark"
+Library.Theme = "Light"
 
 local Themes = {
 	Dark = {
